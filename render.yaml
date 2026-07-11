@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: embedding-api
+    env: docker
+    repo: https://github.com/<your-org>/<your-repo>
+    dockerfilePath: ./embedding-api/Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: MODEL_NAME
+        value: BAAI/bge-small-en-v1.5
+      - key: LOG_LEVEL
+        value: INFO
