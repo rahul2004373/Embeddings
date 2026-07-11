@@ -2,7 +2,7 @@ services:
   - type: web
     name: embedding-api
     env: docker
-    repo: https://github.com/<your-org>/<your-repo>
+    repo: https://github.com/rahul2004373/Embeddings
     dockerfilePath: ./embedding-api/Dockerfile
     healthCheckPath: /health
     envVars:
@@ -10,3 +10,20 @@ services:
         value: BAAI/bge-small-en-v1.5
       - key: LOG_LEVEL
         value: INFO
+
+  - type: web
+    name: bff-server
+    env: docker
+    repo: https://github.com/rahul2004373/Embeddings
+    dockerfilePath: ./entry-point-api/Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: EMBEDDING_API_URL
+        fromService:
+          type: web
+          name: embedding-api
+          property: host
+      - key: BFF_PORT
+        value: "3001"
+      - key: CORS_ORIGINS
+        value: "*"
