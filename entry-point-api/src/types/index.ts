@@ -31,6 +31,13 @@ export interface BffHealthResponse {
   vector_dimension: number;
 }
 
+export interface BffSystemHealthResponse {
+  status: string;
+  cpu_percent: number;
+  memory_usage_mb: number;
+  uptime_seconds: number;
+}
+
 export interface ApiError {
   success: false;
   error: string;

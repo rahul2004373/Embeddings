@@ -44,6 +44,13 @@ class HealthResponse(BaseModel):
     vector_dimension: int
 
 
+class SystemHealthResponse(BaseModel):
+    status: str
+    cpu_percent: float
+    memory_usage_mb: float
+    uptime_seconds: float
+
+
 class ErrorResponse(BaseModel):
     success: bool = False
     error: str

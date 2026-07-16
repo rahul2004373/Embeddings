@@ -1,6 +1,9 @@
 import logging
 import time
 import asyncio
+import os
+
+import psutil
 
 from fastapi import APIRouter
 
@@ -10,12 +13,15 @@ from models import (
     BatchEmbedRequest,
     BatchEmbedResponse,
     HealthResponse,
+    SystemHealthResponse,
 )
 from services import embedding_service
 from config import settings
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
+
+_start_time = time.monotonic()
 
 
 @router.get("/", response_model=HealthResponse)
@@ -65,3 +71,17 @@ async def batch_embed_texts(request: BatchEmbedRequest):
         elapsed * 1000,
     )
     return BatchEmbedResponse(embeddings=embeddings.tolist())
+
+
+@router.get("/system-health", response_model=SystemHealthResponse)
+async def system_health():
+    process = psutil.Process(os.getpid())
+    cpu = process.cpu_percent(interval=0)
+    mem = process.memory_info().rss / (1024 * 1024)
+    uptime = time.monotonic() - _start_time
+    return SystemHealthResponse(
+        status="running",
+        cpu_percent=cpu,
+        memory_usage_mb=round(mem, 2),
+        uptime_seconds=round(uptime, 2),
+    )

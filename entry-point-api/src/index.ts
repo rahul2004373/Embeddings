@@ -7,7 +7,7 @@ import { cacheResponse } from "./middleware/cache";
 import { requestLogger } from "./middleware/requestLogger";
 import { rateLimiter } from "./middleware/rateLimiter";
 import { errorHandler } from "./middleware/errorHandler";
-import type { BffHealthResponse } from "./types";
+import type { BffHealthResponse, BffSystemHealthResponse } from "./types";
 
 const app = express();
 
@@ -43,6 +43,22 @@ app.get("/", cacheResponse, async (_req, res, next) => {
 
 app.get("/health", (_req, res) => {
   res.json({ status: "running" });
+});
+
+app.get("/system-health", (_req, res) => {
+  const cpu = process.cpuUsage();
+  const uptime = process.uptime();
+  const cpuPercent = parseFloat(
+    (((cpu.user + cpu.system) / 1_000_000 / uptime) * 100).toFixed(2),
+  );
+  const memMb = parseFloat((process.memoryUsage().rss / (1024 * 1024)).toFixed(2));
+  const body: BffSystemHealthResponse = {
+    status: "running",
+    cpu_percent: cpuPercent,
+    memory_usage_mb: memMb,
+    uptime_seconds: parseFloat(uptime.toFixed(2)),
+  };
+  res.json(body);
 });
 
 app.use("/api", embeddingRouter);
